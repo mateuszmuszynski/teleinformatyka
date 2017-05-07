@@ -3,10 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:WPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+    <Window.Resources>
+        <Style TargetType="ComboBox">
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="MinWidth" Value="100" />
+        </Style>
+    </Window.Resources>
+    <StackPanel>
+        <WrapPanel>
+            <ComboBox Name="DeviceListComboBox" ItemsSource="{Binding Path=Devices}" DisplayMemberPath="Description"
+                      SelectedValuePath="Name" SelectedItem="{Binding Path=SelectedDevice}" />
+            <Button Name="StartGatheringStatisticsButton" Click="StartGatheringStatisticsButton_OnClick">Start</Button>
+            <Button Name="StopGatheringStatisticsButton" Click="StopGatheringStatisticsButton_OnClick" IsEnabled="False">Stop</Button>
+        </WrapPanel>
+        <Label Content="{Binding Path=TotalStatistics.TotalSentBytes}" ContentStringFormat='Total Sent Bytes: {0}'></Label>
+        <Label Content="{Binding Path=TotalStatistics.TotalReceivedBytes}" ContentStringFormat='Total Received Bytes: {0}'></Label>
+        <Label Content="{Binding Path=TotalStatistics.TotalSentPackets}" ContentStringFormat='Total Sent Packets: {0}'></Label>
+        <Label Content="{Binding Path=TotalStatistics.TotalReceivedPackets}" ContentStringFormat='Total Received Packets: {0}' ></Label>
+        <Label>Live Bytes</Label>
+        <lvc:CartesianChart Height="300" Width="300" Hoverable="False" LegendLocation="Bottom" DataTooltip="{x:Null}">
+            <lvc:CartesianChart.Series>
+                <lvc:LineSeries LineSmoothness="0" Title="Received" Values="{Binding BytesChart.ReceivedItems}" 
+                                PointGeometry="{x:Null}" 
+                                StrokeThickness="1" 
+                                Stroke="#ea1a1a"
+                                Fill="Transparent"/>
+                <lvc:LineSeries LineSmoothness="0" Title="Sent" Values="{Binding BytesChart.SentItems}"
+                                PointGeometry="{x:Null}" 
+                                StrokeThickness="1" 
+                                Stroke="#0f33e7"
+                                Fill="Transparent"/>
+            </lvc:CartesianChart.Series>
+            <lvc:CartesianChart.AxisX>
+                <lvc:Axis LabelFormatter="{Binding BytesChart.DateTimeFormatter}" 
+                          MaxValue="{Binding BytesChart.AxisMax}" 
+                          MinValue="{Binding BytesChart.AxisMin}"
+                          Unit="{Binding BytesChart.AxisUnit}">
+                    <lvc:Axis.Separator>
+                        <lvc:Separator Step="{Binding BytesChart.AxisStep}" />
+                    </lvc:Axis.Separator>
+                </lvc:Axis>
+            </lvc:CartesianChart.AxisX>
+            <lvc:CartesianChart.AxisY>
+                <lvc:Axis Title="Bytes" MinValue="0"></lvc:Axis>
+            </lvc:CartesianChart.AxisY>
+        </lvc:CartesianChart>
+        <Label>Http Status Codes</Label>
+        <lvc:PieChart Height="200" Width="200" Series="{Binding TotalStatistics.HttpStatusCodes}">
+        </lvc:PieChart>
+        <Label>Http Methods</Label>
+        <lvc:PieChart Height="200" Width="200" Series="{Binding TotalStatistics.HttpMethods}">
+        </lvc:PieChart>
+    </StackPanel>
 </Window>
