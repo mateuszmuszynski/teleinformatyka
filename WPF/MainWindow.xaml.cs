@@ -62,18 +62,25 @@ namespace WPF
 
         private void StartGatheringStatisticsButton_OnClick(object sender, RoutedEventArgs e)
         {
-            StartGatheringStatisticsButton.IsEnabled = false;
-            StopGatheringStatisticsButton.IsEnabled = true;
+            try
+            {
+                StartGatheringStatisticsButton.IsEnabled = false;
+                StopGatheringStatisticsButton.IsEnabled = true;
 
-            var deviceModel = ((UserInterfaceViewModel) DataContext).SelectedDevice;
+                var deviceModel = ((UserInterfaceViewModel)DataContext).SelectedDevice;
 
-            var device = _packetService.GetAllDevices().First(x => x.Name == deviceModel.Name);
+                var device = _packetService.GetAllDevices().First(x => x.Name == deviceModel.Name);
 
-            _packetService.StartGatheringStatistics(device, new TimeSpan(0, 0, 1, 0, 0));
+                _packetService.StartGatheringStatistics(device, new TimeSpan(0, 0, 1, 0, 0));
 
-            _timer = new Timer(1000);
-            _timer.Elapsed += GetCurrentStatistics;
-            _timer.Enabled = true;
+                _timer = new Timer(1000);
+                _timer.Elapsed += GetCurrentStatistics;
+                _timer.Enabled = true;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Nie wybrano interfejsu");
+            }
         }
 
         private void GetCurrentStatistics(object sender, ElapsedEventArgs e)

@@ -6,19 +6,21 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:local="clr-namespace:WPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="720" Width="1080" MinHeight="600" MinWidth="800">
+        Title="MainWindow" Height="720" Width="1080" MinHeight="600" MinWidth="800" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="ComboBox">
-            <Setter Property="Margin" Value="10"/>
-            <Setter Property="Width" Value="425" />
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Width" Value="450"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         <Style TargetType="Button">
             <Setter Property="Margin" Value="5"/>
-            <Setter Property="Width" Value="75"/>
+            <Setter Property="Height" Value="50"/>
+
         </Style>
         <Style TargetType="lvc:CartesianChart">
             <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="Height" Value="325"/>
+            
         </Style>
     </Window.Resources>
     <Grid>
@@ -28,12 +30,26 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <WrapPanel Grid.Row="0">
-            <ComboBox Name="DeviceListComboBox" ItemsSource="{Binding Path=Devices}" DisplayMemberPath="Description"
-                      SelectedValuePath="Name" SelectedItem="{Binding Path=SelectedDevice}" />
-            <Button Name="StartGatheringStatisticsButton" Click="StartGatheringStatisticsButton_OnClick">Start</Button>
-            <Button Name="StopGatheringStatisticsButton" Click="StopGatheringStatisticsButton_OnClick" IsEnabled="False">Stop</Button>
-        </WrapPanel>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ComboBox Name="DeviceListComboBox" ItemsSource="{Binding Path=Devices}" DisplayMemberPath="Description" SelectedValuePath="Name" SelectedItem="{Binding Path=SelectedDevice}" Grid.Row="0" Grid.ColumnSpan="2"/>
+            <Button Name="StartGatheringStatisticsButton" Click="StartGatheringStatisticsButton_OnClick" Grid.Row="1" Grid.Column="0">Start</Button>
+            <Button Name="StopGatheringStatisticsButton" Click="StopGatheringStatisticsButton_OnClick" IsEnabled="False" Grid.Row="1" Grid.Column="1">Stop</Button>
+            <StackPanel Grid.Column="2" Grid.RowSpan="2">
+                <Label Content="{Binding Path=TotalStatistics.TotalSentBytes}" Grid.Row="0" Grid.Column="0" ContentStringFormat='Total Sent Bytes: {0}'></Label>
+                <Label Content="{Binding Path=TotalStatistics.TotalReceivedBytes}" Grid.Row="0" Grid.Column="1" ContentStringFormat='Total Received Bytes: {0}'></Label>
+                <Label Content="{Binding Path=TotalStatistics.TotalSentPackets}" Grid.Row="1" Grid.Column="0" ContentStringFormat='Total Sent Packets: {0}'></Label>
+                <Label Content="{Binding Path=TotalStatistics.TotalReceivedPackets}" Grid.Row="1" Grid.Column="1" ContentStringFormat='Total Received Packets: {0}' ></Label>
+            </StackPanel>
+        </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -43,57 +59,45 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Label Content="{Binding Path=TotalStatistics.TotalSentBytes}" Grid.Row="0" Grid.Column="0" ContentStringFormat='Total Sent Bytes: {0}'></Label>
-            <Label Content="{Binding Path=TotalStatistics.TotalReceivedBytes}" Grid.Row="0" Grid.Column="1" ContentStringFormat='Total Received Bytes: {0}'></Label>
-            <Label Content="{Binding Path=TotalStatistics.TotalSentPackets}" Grid.Row="1" Grid.Column="0" ContentStringFormat='Total Sent Packets: {0}'></Label>
-            <Label Content="{Binding Path=TotalStatistics.TotalReceivedPackets}" Grid.Row="1" Grid.Column="1" ContentStringFormat='Total Received Packets: {0}' ></Label>
         </Grid>
-        <StackPanel Grid.Row="2">
-            <Label>Live Bytes</Label>
-            <!-- Width="300"-->
-            <lvc:CartesianChart Hoverable="False" LegendLocation="Bottom" DataTooltip="{x:Null}">
-                <lvc:CartesianChart.Series>
-                    <lvc:LineSeries LineSmoothness="0" Title="Received" Values="{Binding BytesChart.ReceivedItems}" 
+        <TabControl  Grid.Row="2">
+            <TabItem Header="Live Bytes" >
+                <lvc:CartesianChart Hoverable="False" VerticalContentAlignment="Stretch" LegendLocation="Bottom" DataTooltip="{x:Null}">
+                    <lvc:CartesianChart.Series>
+                        <lvc:LineSeries LineSmoothness="0" Title="Received" Values="{Binding BytesChart.ReceivedItems}" 
                                 PointGeometry="{x:Null}" 
                                 StrokeThickness="1" 
                                 Stroke="#ea1a1a"
                                 Fill="Transparent"/>
-                    <lvc:LineSeries LineSmoothness="0" Title="Sent" Values="{Binding BytesChart.SentItems}"
+                        <lvc:LineSeries LineSmoothness="0" Title="Sent" Values="{Binding BytesChart.SentItems}"
                                 PointGeometry="{x:Null}" 
                                 StrokeThickness="1" 
                                 Stroke="#0f33e7"
                                 Fill="Transparent"/>
-                </lvc:CartesianChart.Series>
-                <lvc:CartesianChart.AxisX>
-                    <lvc:Axis LabelFormatter="{Binding BytesChart.DateTimeFormatter}" 
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis LabelFormatter="{Binding BytesChart.DateTimeFormatter}" 
                           MaxValue="{Binding BytesChart.AxisMax}" 
                           MinValue="{Binding BytesChart.AxisMin}"
                           Unit="{Binding BytesChart.AxisUnit}">
-                        <lvc:Axis.Separator>
-                            <lvc:Separator Step="{Binding BytesChart.AxisStep}" />
-                        </lvc:Axis.Separator>
-                    </lvc:Axis>
-                </lvc:CartesianChart.AxisX>
-                <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Bytes" MinValue="0"></lvc:Axis>
-                </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>
-        </StackPanel>
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Label Content="Http Status Codes" Grid.Row="0" Grid.Column="0"/>
-            <lvc:PieChart Height="200" Width="200" Grid.Row="1" Grid.Column="0" Series="{Binding TotalStatistics.HttpStatusCodes}">
-            </lvc:PieChart>
-            <Label Content="Http Methods" Grid.Row="0" Grid.Column="1"/>
-            <lvc:PieChart Height="200" Width="200" Grid.Row="1" Grid.Column="1" Series="{Binding TotalStatistics.HttpMethods}">
-            </lvc:PieChart>
-        </Grid>
+                            <lvc:Axis.Separator>
+                                <lvc:Separator Step="{Binding BytesChart.AxisStep}" />
+                            </lvc:Axis.Separator>
+                        </lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="Bytes" MinValue="0"></lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </TabItem>
+            <TabItem Header="Http Codes">
+                <lvc:PieChart Grid.Row="1" Grid.Column="0" Series="{Binding TotalStatistics.HttpStatusCodes}">
+                </lvc:PieChart>
+            </TabItem>
+            <TabItem Header="Http Methods">
+                <lvc:PieChart Grid.Row="1" Grid.Column="1" Series="{Binding TotalStatistics.HttpMethods}">
+                </lvc:PieChart>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

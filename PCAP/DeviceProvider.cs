@@ -9,7 +9,7 @@ namespace PCAP
     {
         public List<DeviceDto> GetAllDevices()
         {
-            var allDevices = LivePacketDevice.AllLocalMachine;
+        var allDevices = LivePacketDevice.AllLocalMachine;
 
             return allDevices.Select(x => new DeviceDto
             {
